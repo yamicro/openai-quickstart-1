@@ -38,7 +38,7 @@ class OpenAIModel(Model):
             except openai.RateLimitError as e:
                 attempts += 1
                 if attempts < 3:
-                    LOG.warning("Rate limit reached. Waiting for 60 seconds before retrying.")
+                    LOG.warning("Rate limit reached. Waiting for 60 seconds before retrying.", e)
                     time.sleep(60)
                 else:
                     raise Exception("Rate limit reached. Maximum attempts exceeded.")
