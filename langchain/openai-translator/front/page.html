@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Translator v2.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #5cb85c;
+            color: white;
+        }
+
+        select,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>OpenAI Translator v2.0</h2>
+        <div class="custom-file-upload" onclick="document.getElementById('pdfUpload').click()">
+            Upload PDF File
+            <input type="file" id="pdfUpload" accept=".pdf" style="display: none;" onchange="fileSelected();" />
+            <embed id="pdfViewer" src="" type="application/pdf" width="100%" height="500px" style="display: none;">
+
+        </div>
+        <br>
+        <select id="sourceLanguage">
+            <option value="English" selected>English</option>
+            <option value="Chinese" selected>Chinese</option>
+            <!-- 其他语言选项 -->
+        </select>
+        <select id="targetLanguage">
+            <option value="Chinese" selected>Chinese</option>
+            <option value="English" selected>English</option>
+
+            <!-- 其他语言选项 -->
+        </select>
+        <button onclick="submitTranslation()">Submit</button>
+        <button onclick="clearFields()">Clear</button>
+    </div>
+
+    <script>
+        function fileSelected() {
+            var fileName = document.getElementById('pdfUpload').files[0].name;
+            alert('Selected file: ' + fileName);
+        }
+
+        function submitTranslation() {
+            var pdfFile = document.getElementById('pdfUpload').files[0];
+            var sourceLang = document.getElementById('sourceLanguage').value;
+            var targetLang = document.getElementById('targetLanguage').value;
+
+            if (pdfFile) {
+                var formData = new FormData();
+                formData.append('file', pdfFile);
+                formData.append('sourceLang', sourceLang);
+                formData.append('targetLang', targetLang);
+
+                fetch('127.0.0.1:5000/upload-and-translate-pdf', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert('Translation submitted successfully.');
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting the translation.');
+                    });
+            } else {
+                alert('Please select a PDF file first.');
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('pdfUpload').value = '';
+            document.getElementById('sourceLanguage').selectedIndex = 0;
+            document.getElementById('targetLanguage').selectedIndex = 0;
+            document.getElementById('pdfViewer').style.display = 'none'; // 隐藏PDF预览
+            document.getElementById('pdfViewer').src = ''; // 清除之前的PDF源
+        }
+
+        function fileSelected() {
+            var fileInput = document.getElementById('pdfUpload');
+            var pdfViewer = document.getElementById('pdfViewer');
+
+            if (fileInput.files && fileInput.files[0]) {
+                var fileUrl = URL.createObjectURL(fileInput.files[0]);
+                pdfViewer.src = fileUrl;
+                pdfViewer.style.display = 'block'; // 显示PDF预览
+            }
+        }
+    </script>
+</body>
+
+</html>
