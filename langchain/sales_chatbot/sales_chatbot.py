@@ -4,11 +4,13 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+import os
 
 
-def initialize_sales_bot(vector_store_dir: str="real_estates_sale"):
-    db = FAISS.load_local(vector_store_dir, OpenAIEmbeddings())
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+
+def initialize_sales_bot(vector_store_dir: str="real_estates_sale"): 
+    db = FAISS.load_local(vector_store_dir, OpenAIEmbeddings(),allow_dangerous_deserialization=True)
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, api_key="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")
     
     global SALES_BOT    
     SALES_BOT = RetrievalQA.from_chain_type(llm,
@@ -40,10 +42,12 @@ def sales_chat(message, history):
 def launch_gradio():
     demo = gr.ChatInterface(
         fn=sales_chat,
-        title="房产销售",
+        title="全能销售",
         # retry_btn=None,
         # undo_btn=None,
         chatbot=gr.Chatbot(height=600),
+        # inputs="text",
+        # outputs="text",
     )
 
     demo.launch(share=True, server_name="0.0.0.0")
